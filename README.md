@@ -4,7 +4,7 @@ An expense department that works in team chat. **You post your bills, and you on
 
 Ten AI agents read the bills, check policy, tax and risk, route the claim to the right approvers, settle it and post balanced accounting entries. People make every decision. Built on [Switch](https://github.com/sandbox-quantum/switch) for the [Flip the Switch hackathon](https://www.wemakedevs.org/hackathons/switch), Best Business Workflow track.
 
-**[Demo video](DEMO_VIDEO_LINK)** · **[Blog post](https://dev.to/akash_goyal/making-expense-claims-easy-for-employees-and-accounts-teams-with-switch-536e)**
+**[Demo video](https://youtu.be/oPdrQMlJe7w)** · **[Blog post](https://dev.to/akash_goyal/making-expense-claims-easy-for-employees-and-accounts-teams-with-switch-536e)**
 
 > **Status:** one full live run in Mattermost, from "new claim" to a balanced journal, with two approvers and an escalation. The real outputs are in [`samples/output/`](samples/output/). All people, bills and policy values are fictional.
 
