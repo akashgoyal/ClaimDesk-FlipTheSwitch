@@ -1,0 +1,96 @@
+{
+  "_note": "Fictional sample policy. Replace every value before real use. These are not tax or accounting advice.",
+  "company": "Meridian Consulting (fictional)",
+  "company_gstin": "27AAACM0001A1ZL",
+  "base_currency": "INR",
+  "city_tiers": {
+    "Mumbai": "A",
+    "Delhi": "A",
+    "Bengaluru": "A",
+    "Pune": "B",
+    "Hyderabad": "B",
+    "Chennai": "B",
+    "Jaipur": "C",
+    "Nagpur": "C"
+  },
+  "grades": {
+    "G3": {
+      "hotel_per_night": {
+        "A": 7000,
+        "B": 5000,
+        "C": 3500
+      },
+      "meal_limit": 1500,
+      "per_diem": {
+        "A": 1000,
+        "B": 800,
+        "C": 600
+      },
+      "flight_cabins": [
+        "economy"
+      ]
+    },
+    "G5": {
+      "hotel_per_night": {
+        "A": 11000,
+        "B": 8000,
+        "C": 6000
+      },
+      "meal_limit": 2500,
+      "per_diem": {
+        "A": 1500,
+        "B": 1200,
+        "C": 900
+      },
+      "flight_cabins": [
+        "economy",
+        "premium economy"
+      ]
+    }
+  },
+  "mileage_per_km": 12,
+  "submission_days": 30,
+  "bill_required_above": 300,
+  "round_amount_flag_above": 1000,
+  "approval_matrix": [
+    {
+      "up_to": 25000,
+      "chain": [
+        "manager"
+      ]
+    },
+    {
+      "up_to": null,
+      "chain": [
+        "manager",
+        "finance_head"
+      ]
+    }
+  ],
+  "allow_self_approval": false,
+  "gst": {
+    "credit_blocked_on": [
+      "meal"
+    ]
+  },
+  "gl": {
+    "flight": "6101",
+    "train": "6102",
+    "taxi": "6103",
+    "hotel": "6104",
+    "meal": "6105",
+    "per_diem": "6106",
+    "mileage": "6107",
+    "other": "6109",
+    "gst_expense": "6199",
+    "gst_input": "1401",
+    "advances": "1310",
+    "card_clearing": "2210",
+    "employee_payable": "2205",
+    "employee_receivable": "1320"
+  },
+  "approval_expiry_minutes": 1440,
+  "escalation": {
+    "manager": "finance_head"
+  }
+}

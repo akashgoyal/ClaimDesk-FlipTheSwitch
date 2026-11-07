@@ -1,0 +1,4 @@
+employee_id,name,username,grade,department,cost_center,manager_username,role
+E1042,Alex Mehta,employee-alex,G3,Sales,CC-410,manager-tom,employee
+E1007,Tom Clark,manager-tom,G5,Sales,CC-410,manager-tom,finance_head
+E1088,Maya Iyer,employee-maya,G3,Delivery,CC-520,manager-tom,employee

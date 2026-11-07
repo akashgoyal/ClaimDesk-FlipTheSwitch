@@ -1,0 +1,6 @@
+[
+  {"case": "EXP-0901", "employee_id": "E1088", "department": "Delivery", "posted": "2026-09-22", "total": "18450.00",
+   "exceptions": 1, "lines": [{"invoice": "HTL-2210-AB", "amount": "9200.00", "category": "hotel"}, {"invoice": "AIR-40K1-TD", "amount": "9250.00", "category": "flight"}]},
+  {"case": "EXP-0902", "employee_id": "E1042", "department": "Sales", "posted": "2026-09-29", "total": "7320.00",
+   "exceptions": 0, "lines": [{"invoice": "CAB-0871", "amount": "620.00", "category": "taxi"}, {"invoice": "HTL-1188-QM", "amount": "6700.00", "category": "hotel"}]}
+]

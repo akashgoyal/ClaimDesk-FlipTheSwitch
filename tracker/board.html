@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClaimDesk Board</title>
+<style>
+  :root {
+    --bg: #f3f5fa; --panel: #ffffff; --card: #ffffff; --ink: #171c2b; --soft: #5f677b; --line: #e1e5ef; --head: linear-gradient(100deg, #141a2e, #1f2c52 70%, #1b4a5c);
+    --accent: #17705b; --accent-soft: #e1f3ec; --wait: #b86200; --wait-soft: #fdf0dc; --bad: #b3261e; --bad-soft: #fbe4e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #11141d; --panel: #1b1f2b; --card: #262b3a; --ink: #f1f2f6; --soft: #a7aec0; --line: #343a4c;
+      --accent: #5fc9ad; --accent-soft: #1d3a33; --wait: #f0ac55; --wait-soft: #3d2d15; --bad: #f28b82; --bad-soft: #43201e; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.35 -apple-system, "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 24px; padding: 18px 24px 16px; background: var(--head); color: #fff; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -.015em; }
+  .summary { color: #c8d0e4; font-variant-numeric: tabular-nums; }
+  .summary b { color: #fff; }
+  .live { margin-left: auto; color: #c8d0e4; font-size: 13px; }
+  .live::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #5fe0bd; margin-right: 6px; }
+  .live.off::before { background: #ff8a80; }
+  main { flex: 1; display: grid; align-items: stretch; grid-template-columns: repeat(8, minmax(158px, 1fr)); gap: 10px; padding: 16px 24px 12px; overflow-x: auto; }
+  .col { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 12px; padding: 11px 9px; min-height: 200px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 8px rgba(23, 30, 55, .06); }
+  .col.human { border-top-color: var(--wait); }
+  .col h2 { margin: 0 2px 3px; font-size: 13.5px; font-weight: 700; display: flex; justify-content: space-between; gap: 6px; }
+  .col h2 span { color: var(--soft); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .col.human h2 { color: var(--wait); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 11px; display: grid; gap: 3px; box-shadow: 0 3px 10px rgba(23, 30, 55, .1); }
+  .card.moved { animation: arrive .7s ease-out; }
+  @keyframes arrive { from { transform: translateY(-8px) scale(.97); opacity: 0; box-shadow: 0 0 0 3px var(--accent); } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .card.moved { animation: none; } }
+  .id { font-size: 12px; font-weight: 600; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .who { font-weight: 700; font-size: 15.5px; }
+  .why { font-size: 13px; color: var(--soft); overflow-wrap: anywhere; }
+  .total { font-weight: 800; font-size: 17px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .tag { justify-self: start; margin-top: 4px; padding: 3px 8px; border-radius: 7px; font-size: 12px; font-weight: 700; background: var(--accent-soft); color: var(--accent); overflow-wrap: anywhere; }
+  .tag.you { background: var(--wait-soft); color: var(--wait); }
+  .tag.bad { background: var(--bad-soft); color: var(--bad); }
+  footer { padding: 0 24px 12px; color: var(--soft); font-size: 12px; }
+  @media (max-width: 720px) {
+    header { padding: 14px 16px 12px; }
+    main { padding: 12px 16px; grid-template-columns: 1fr; overflow-x: visible; }
+    .col { min-height: 0; }
+    footer { padding: 0 16px 12px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>ClaimDesk</h1>
+  <div class="summary" id="summary"></div>
+  <div class="live" id="live">Connecting</div>
+</header>
+<main id="board"></main>
+<footer>Fictional sample data. Stages come from the rules engine, not from an AI's description of them.</footer>
+<script>
+  const HUMAN = new Set(["Waiting for bills", "Queued", "Waiting for employee", "Approval"]);
+  const AGENTS = new Set(["agents", "clerk", "accountant"]);
+  const money = (value) => "₹" + Number(value).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const place = {};
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function card(item) {
+    const node = element("article", "card");
+    node.append(element("div", "id", item.case), element("div", "who", item.employee));
+    if (item.purpose) node.append(element("div", "why", item.purpose));
+    if (item.total) node.append(element("div", "total", money(item.total)));
+    if (item.overdue) node.append(element("div", "tag bad", "Overdue: " + item.waiting_on));
+    else if (item.escalated && item.stage === "Approval" && !AGENTS.has(item.waiting_on)) node.append(element("div", "tag bad", "Escalated to " + item.waiting_on));
+    else if (AGENTS.has(item.waiting_on) && item.waiting_on !== "agents") node.append(element("div", "tag", "With the " + item.waiting_on));
+    else if (item.waiting_on === "agents") node.append(element("div", "tag", "Agents working"));
+    else if (item.waiting_on) node.append(element("div", "tag you", "Waiting on " + item.waiting_on));
+    else node.append(element("div", "tag", "Done"));
+    if (place[item.case] !== undefined && place[item.case] !== item.stage) node.classList.add("moved");
+    place[item.case] = item.stage;
+    return node;
+  }
+
+  function render(data) {
+    const board = document.getElementById("board");
+    board.replaceChildren(...data.stages.map((name) => {
+      const items = data.cases.filter((item) => item.stage === name);
+      const column = element("section", "col" + (HUMAN.has(name) ? " human" : ""));
+      const head = element("h2", "", name);
+      head.append(element("span", "", String(items.length)));
+      column.append(head, ...items.map(card));
+      return column;
+    }));
+    const open = data.cases.filter((item) => item.stage !== "Posted").length;
+    const posted = data.cases.length - open;
+    const waiting = data.cases.filter((item) => HUMAN.has(item.stage) && !AGENTS.has(item.waiting_on)).length;
+    const summary = document.getElementById("summary");
+    summary.replaceChildren();
+    [["open", open], ["waiting on a person", waiting], ["posted", posted]].forEach(([label, count], index) => {
+      if (index) summary.append(" · ");
+      summary.append(element("b", "", String(count)), " " + label);
+    });
+  }
+
+  async function refresh() {
+    const live = document.getElementById("live");
+    try {
+      const response = await fetch("tracker.json", { cache: "no-store" });
+      const data = await response.json();
+      render(data);
+      live.className = "live";
+      live.textContent = data.updated ? "Live. Last change " + new Date(data.updated).toLocaleTimeString() : "Live. No claims yet";
+    } catch (error) {
+      live.className = "live off";
+      live.textContent = "Not connected";
+    }
+  }
+  refresh();
+  setInterval(refresh, 1500);
+</script>
+</body>
+</html>

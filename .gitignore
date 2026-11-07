@@ -1,0 +1,5 @@
+.DS_Store
+__pycache__/
+*.pyc
+# Local-only test logins; never commit.
+.local-test-accounts.txt
